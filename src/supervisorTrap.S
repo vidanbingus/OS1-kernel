@@ -13,9 +13,9 @@ supervisorTrap:
     .endr
 
     # ovde treba provera koji je razlog skoka u prekidnu rutinu
-    # 1) ili je sistemski poziv, sto je sinhrono
-    # 2) ili je tajmer koji je softverski prekid
-    # 3) ili je konzola koja je asinhroni prekid spolja
+    # 1) ili je sistemski poziv, sto je sinhrono     ->     scause == 8 ili 9
+    # 2) ili je tajmer koji je softverski prekid     ->     scause == 0x8000000000000001
+    # 3) ili je konzola koja je asinhroni prekid spolja ->  scause == 0x8000000000000009
 
     # Mare je ovde pre svakog 'call' clear-ovao bit 1 u sip registru, nz zasto
 
