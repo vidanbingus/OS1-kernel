@@ -6,7 +6,7 @@
 
 void* mem_alloc(size_t size) {
 
-    size = ((size + MEM_BLOCK_SIZE - 1) / MEM_BLOCK_SIZE) * MEM_BLOCK_SIZE;
+    size = (size + MEM_BLOCK_SIZE - 1) / MEM_BLOCK_SIZE;
 
     //priprema argumenata za sistemski poziv
     __asm__ volatile ("li a0, 0x01");               //0x01 je opCode za mem_alloc

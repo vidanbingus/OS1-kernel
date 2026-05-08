@@ -1,0 +1,139 @@
+GAS LISTING /tmp/ccamqZQF.s 			page 1
+
+
+   1              		.file	"main.cpp"
+   2              		.option pic
+   3              		.option norelax
+   4              		.text
+   5              	.Ltext0:
+   6              		.align	2
+   7              		.globl	main
+   9              	main:
+  10              	.LFB16:
+  11              		.file 1 "src/main.cpp"
+   1:src/main.cpp  **** #include "../lib/console.h"
+   2:src/main.cpp  **** #include "../h/riscv.h"
+   3:src/main.cpp  **** 
+   4:src/main.cpp  **** extern "C" void supervisorTrap(void);
+   5:src/main.cpp  **** 
+   6:src/main.cpp  **** void main() {
+  12              		.loc 1 6 13
+  13              		.cfi_startproc
+  14 0000 130101FF 		addi	sp,sp,-16
+  15              		.cfi_def_cfa_offset 16
+  16 0004 23341100 		sd	ra,8(sp)
+  17 0008 23308100 		sd	s0,0(sp)
+  18              		.cfi_offset 1, -8
+  19              		.cfi_offset 8, -16
+  20 000c 13040101 		addi	s0,sp,16
+  21              		.cfi_def_cfa 8, 0
+   7:src/main.cpp  ****     __putc('f');
+  22              		.loc 1 7 5
+  23              		.loc 1 7 11 is_stmt 0
+  24 0010 13056006 		li	a0,102
+  25 0014 97000000 		call	__putc@plt
+  25      E7800000 
+  26              	.LVL0:
+   8:src/main.cpp  ****     __putc('\n');
+  27              		.loc 1 8 5 is_stmt 1
+  28              		.loc 1 8 11 is_stmt 0
+  29 001c 1305A000 		li	a0,10
+  30 0020 97000000 		call	__putc@plt
+  30      E7800000 
+  31              	.LVL1:
+   9:src/main.cpp  **** 
+  10:src/main.cpp  ****     // u IVTP stavi pocetnu adresu prekidnih rutina
+  11:src/main.cpp  ****     __asm__ volatile ("csrw stvec, %0" : : "r" ((uint64)&supervisorTrap));
+  32              		.loc 1 11 5 is_stmt 1
+  33              		.loc 1 11 74 is_stmt 0
+  34 0028 97070000 		la	a5,supervisorTrap
+  34      83B70700 
+  35              	#APP
+  36              	# 11 "src/main.cpp" 1
+  12              	    // ukljuci prekide
+  13:src/main.cpp  ****     __asm__ volatile ("csrs sstatus, 0x02");
+  37              		csrw stvec, a5
+  38              	# 0 "" 2
+  39              		.loc 1 13 5 is_stmt 1
+  40              		.loc 1 13 44 is_stmt 0
+  41              	# 13 "src/main.cpp" 1
+  14              	    while (1);
+GAS LISTING /tmp/ccamqZQF.s 			page 2
+
+
+  42              		csrs sstatus, 0x02
+  43              	# 0 "" 2
+  44              	#NO_APP
+  45              	.L2:
+  46              		.loc 1 14 5 is_stmt 1 discriminator 1
+  47              		.loc 1 14 5 discriminator 1
+  48 0038 6F000000 		j	.L2
+  49              		.cfi_endproc
+  50              	.LFE16:
+  52              	.Letext0:
+  53              		.file 2 "src/../h/../lib/hw.h"
+  54              		.file 3 "src/../lib/console.h"
+GAS LISTING /tmp/ccamqZQF.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 main.cpp
+     /tmp/ccamqZQF.s:9      .text:0000000000000000 main
+     /tmp/ccamqZQF.s:13     .text:0000000000000000 .L0 
+     /tmp/ccamqZQF.s:14     .text:0000000000000000 .L0 
+     /tmp/ccamqZQF.s:15     .text:0000000000000004 .L0 
+     /tmp/ccamqZQF.s:18     .text:000000000000000c .L0 
+     /tmp/ccamqZQF.s:19     .text:000000000000000c .L0 
+     /tmp/ccamqZQF.s:21     .text:0000000000000010 .L0 
+     /tmp/ccamqZQF.s:23     .text:0000000000000010 .L0 
+     /tmp/ccamqZQF.s:24     .text:0000000000000010 .L0 
+     /tmp/ccamqZQF.s:28     .text:000000000000001c .L0 
+     /tmp/ccamqZQF.s:29     .text:000000000000001c .L0 
+     /tmp/ccamqZQF.s:33     .text:0000000000000028 .L0 
+     /tmp/ccamqZQF.s:34     .text:0000000000000028 .L0 
+     /tmp/ccamqZQF.s:40     .text:0000000000000034 .L0 
+        src/main.cpp:13     .text:0000000000000034 .L0 
+     /tmp/ccamqZQF.s:47     .text:0000000000000038 .L0 
+     /tmp/ccamqZQF.s:48     .text:0000000000000038 .L0 
+     /tmp/ccamqZQF.s:49     .text:000000000000003c .L0 
+     /tmp/ccamqZQF.s:55     .text:000000000000003c .L0 
+     /tmp/ccamqZQF.s:34     .text:0000000000000028 .L0 
+     /tmp/ccamqZQF.s:45     .text:0000000000000038 .L2
+     /tmp/ccamqZQF.s:216    .debug_abbrev:0000000000000000 .Ldebug_abbrev0
+     /tmp/ccamqZQF.s:447    .debug_str:00000000000000a6 .LASF17
+     /tmp/ccamqZQF.s:451    .debug_str:000000000000016f .LASF18
+     /tmp/ccamqZQF.s:463    .debug_str:00000000000001c6 .LASF19
+     /tmp/ccamqZQF.s:5      .text:0000000000000000 .Ltext0
+     /tmp/ccamqZQF.s:52     .text:000000000000003c .Letext0
+     /tmp/ccamqZQF.s:423    .debug_line:0000000000000000 .Ldebug_line0
+     /tmp/ccamqZQF.s:453    .debug_str:000000000000017c .LASF0
+     /tmp/ccamqZQF.s:443    .debug_str:0000000000000087 .LASF1
+     /tmp/ccamqZQF.s:439    .debug_str:0000000000000067 .LASF2
+     /tmp/ccamqZQF.s:431    .debug_str:0000000000000028 .LASF4
+     /tmp/ccamqZQF.s:441    .debug_str:0000000000000075 .LASF3
+     /tmp/ccamqZQF.s:427    .debug_str:0000000000000013 .LASF5
+     /tmp/ccamqZQF.s:425    .debug_str:0000000000000000 .LASF6
+     /tmp/ccamqZQF.s:435    .debug_str:0000000000000045 .LASF7
+     /tmp/ccamqZQF.s:459    .debug_str:00000000000001a0 .LASF8
+     /tmp/ccamqZQF.s:429    .debug_str:000000000000001a .LASF9
+     /tmp/ccamqZQF.s:467    .debug_str:00000000000001f4 .LASF10
+     /tmp/ccamqZQF.s:437    .debug_str:0000000000000058 .LASF11
+     /tmp/ccamqZQF.s:465    .debug_str:00000000000001e4 .LASF12
+     /tmp/ccamqZQF.s:455    .debug_str:0000000000000189 .LASF13
+     /tmp/ccamqZQF.s:445    .debug_str:000000000000009a .LASF14
+     /tmp/ccamqZQF.s:433    .debug_str:000000000000002f .LASF15
+     /tmp/ccamqZQF.s:461    .debug_str:00000000000001b0 .LASF16
+     /tmp/ccamqZQF.s:449    .debug_str:000000000000016a .LASF20
+     /tmp/ccamqZQF.s:10     .text:0000000000000000 .LFB16
+     /tmp/ccamqZQF.s:50     .text:000000000000003c .LFE16
+     /tmp/ccamqZQF.s:26     .text:000000000000001c .LVL0
+     /tmp/ccamqZQF.s:31     .text:0000000000000028 .LVL1
+     /tmp/ccamqZQF.s:457    .debug_str:0000000000000199 .LASF21
+     /tmp/ccamqZQF.s:56     .debug_info:0000000000000000 .Ldebug_info0
+
+UNDEFINED SYMBOLS
+__putc
+GAS LISTING /tmp/ccamqZQF.s 			page 4
+
+
+supervisorTrap
