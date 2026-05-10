@@ -1,3 +1,7 @@
 .gdbinit
 kernel
 kernel.asm
+*.d
+*.lst
+*.o
+/.idea
