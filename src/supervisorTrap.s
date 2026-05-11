@@ -36,17 +36,23 @@ supervisorTrap:
     li t1, 0x8000000000000009
     beq t0, t1, handleConsoleInterrupt__LABEL
 
+
     handleSynchronousSysCalls__LABEL:
     call handleSynchronousSysCalls
+    jal popAllRegistersExceptA0__LABEL # a0 je x10
 
     handleTimerInterrupt__LABEL:
     call handleTimerInterrupt
+    jal popAllRegisters__LABEL
 
     handleConsoleInterrupt__LABEL:
     call handleConsoleInterrupt
+    jal popAllRegisters__LABEL
 
-    # pop all registers from stack
-    .irp index, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+    popAllRegisters__LABEL: # ako je syscall, tj. ako ima povratnu vrednost onda ne treba
+    ld a0, 80(sp) # da se pop-uje a0 (mada ako syscall nema povratnu onda videcemo)
+    popAllRegistersExceptA0__LABEL:
+    .irp index, 0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
     ld x\index, \index * 8(sp)
     .endr
     addi sp, sp, 256
