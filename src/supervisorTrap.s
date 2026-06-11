@@ -24,7 +24,6 @@ supervisorTrap:
     # 2) ili je tajmer koji je softverski prekid -> scause == 0x8000000000000001
     # 3) ili je konzola koja je asinhroni prekid spolja -> scause == 0x8000000000000009
 
-    # Mare je ovde pre svakog 'call' clear-ovao bit 1 u sip registru, nz zasto
 
     csrr t0, scause
     li t1, 8
@@ -52,7 +51,7 @@ supervisorTrap:
     popAllRegisters__LABEL: # ako je syscall, tj. ako ima povratnu vrednost onda ne treba
     ld a0, 80(sp) # da se pop-uje a0 (mada ako syscall nema povratnu onda videcemo)
     popAllRegistersExceptA0__LABEL:
-    .irp index, 0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+    .irp index, 0,1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 #primetiti da fali index 10
     ld x\index, \index * 8(sp)
     .endr
     addi sp, sp, 256

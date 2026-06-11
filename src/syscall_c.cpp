@@ -1,6 +1,6 @@
 #include "../h/syscall_c.h"
 
-//umesto da svaki putpripremas syscall pojedinacnim instrikcijama koje loaduju u a0,a1..
+//umesto da svaki put pripremas syscall pojedinacnim instrikcijama koje loaduju u a0,a1..
 //napravi funkciju koja to radi
 //takodje, za povratnu vrednost napravi funkciju koja to radi
 

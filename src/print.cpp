@@ -39,7 +39,6 @@ int print_size(size_t val, uint8 base) {
     while (count != 0) {
         __putc(digits[buffer[--count]]);
     }
-    __putc('\n');
     return 0;
 }
 
