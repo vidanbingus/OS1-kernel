@@ -11,6 +11,7 @@ public:
 
     bool isFinished() const { return finished; }
     void setFinished(bool finished) { this->finished = finished; }
+    uint64 getTimeSlice() const { return timeSlice; }
 
     using Body = void (*) (void);
 
@@ -22,12 +23,13 @@ public:
     static TCB* running;
 
 private:
-    TCB(Body body) :
+    TCB(Body body, uint64 timeSlice) :
         body(body),
         stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
-        context({ body != nullptr? (uint64)body : 0,
+        context({ (uint64)&threadWrapper,
                 stack != nullptr? (uint64) &stack[STACK_SIZE] : 0
                 }),
+        timeSlice(timeSlice),
         finished(false)
     {
         if (body!=nullptr) Scheduler::put(this);
@@ -39,9 +41,17 @@ private:
     Body body;
     uint64* stack;
     Context context;
+    uint64 timeSlice;
     bool finished;
 
+    static uint64 timeSliceCounter;
+
     static uint64 constexpr STACK_SIZE = 1024;
+    static uint64 constexpr TIME_SLICE = 2;
+
+    friend class RiscV;
+
+    static void threadWrapper();
 private:
     static void dispatch();
     static void contextSwitch(Context *oldContext, Context *newContext);

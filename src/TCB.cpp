@@ -3,16 +3,14 @@
 
 
 TCB* TCB::running = nullptr;
+uint64 TCB::timeSliceCounter = 0;
+
 TCB* TCB::createThread(Body body) {
-    return new TCB(body);
+    return new TCB(body,TIME_SLICE);
 }
 
 void TCB::yield() {
-    RiscV::pushRegisters();
-
-    TCB::dispatch();
-
-    RiscV::popRegisters();
+    __asm__ volatile("ecall");
 }
 
 void TCB::dispatch() {
@@ -21,4 +19,11 @@ void TCB::dispatch() {
     running = Scheduler::get();
 
     TCB::contextSwitch(&old->context, &running->context);
+}
+
+void TCB::threadWrapper() {
+    RiscV::extractSppSpie();
+    running->body();
+    running->setFinished(true);
+    TCB::yield();
 }

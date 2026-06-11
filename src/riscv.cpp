@@ -2,9 +2,14 @@
 #include "../h/opCodes.h"
 #include "../h/MemoryAllocator.h"
 
+void RiscV::extractSppSpie() {
+    __asm__ volatile ("csrw sepc, ra");
+    __asm__ volatile ("sret");
+}
+
 void RiscV::handleSynchronousSysCalls() {
 
-    uint64 volatile sepc = r_sepc();
+    uint64 volatile sepc = r_sepc() + 4;
     uint64 volatile sstatus = r_sstatus();
 
     uint64 opCode;
@@ -27,20 +32,44 @@ void RiscV::handleSynchronousSysCalls() {
             __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
+        case THREAD_CREATE: {
+            break;
+        }
+        case THREAD_DISPATCH: {
+            TCB::timeSliceCounter=0;
+            TCB::dispatch();
+            break;
+        }
         default:
             break;
     }
-    //vracamo staru statusnu rec i inkrementiramo sepc
+    //vracamo staru statusnu rec i inkrementirani sepc
     w_sstatus(sstatus);
-    w_sepc(sepc + 4);
+    w_sepc(sepc);
 
 }
 
 void RiscV::handleTimerInterrupt() {
     //verovatno ce trebati ovde da se desava promena konteksta
+
+    TCB::timeSliceCounter++;
+    if (TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
+        uint64 sepc = r_sepc();
+        uint64 sstatus = r_sstatus();
+
+        TCB::timeSliceCounter = 0;
+
+        TCB::dispatch();
+
+        w_sepc(sepc);
+        w_sstatus(sstatus);
+    }
+    mc_sip(SIP_SSIP);
+
 }
 
 void RiscV::handleConsoleInterrupt() {
 
+    console_handler();
 }
 

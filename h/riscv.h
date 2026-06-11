@@ -2,6 +2,8 @@
 #define riscv
 
 #include "../lib/hw.h"
+#include "../lib/console.h"
+#include "../h/TCB.h"
 
 class RiscV {
 public:
@@ -17,6 +19,8 @@ private:
 public:
     static void pushRegisters();    //push x3..x31 na stek
     static void popRegisters();     //pop  x3..x31 na stek
+
+    static void extractSppSpie();   //ne sme da bude inline nikako
 
     // funkcije koje su navedene ispod su u formatu r_sreg ili w_sreg sto oznacava citanje ili upis,
     // a sreg je sistemski registar na koji se to r ili w odnosi:
@@ -47,6 +51,18 @@ public:
 
     // funkcije koje su navedene ispod maskiraju bitove sistemskih registara:
     // ms_ je mask-set, mc_ je mask-clear
+
+    enum BitMaskSip {
+        SIP_SSIP = (1 << 1),
+        SIP_STIP = (1 << 5),
+        SIP_SEIP = (1 << 9),
+    };
+    enum BitMaskSstatus
+    {
+        SSTATUS_SIE = (1 << 1),
+        SSTATUS_SPIE = (1 << 5),
+        SSTATUS_SPP = (1 << 8),
+    };
 
     static void     ms_sstatus(uint64 mask);
 
