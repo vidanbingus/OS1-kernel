@@ -14,6 +14,7 @@ int main() {
 
     MemoryAllocator::init();
     print_ptr(HEAP_START_ADDR);
+    print_char('\n');
 
 
 
@@ -21,11 +22,20 @@ int main() {
     __asm__ volatile ("csrw stvec, %0" : : "r" ((uint64)&supervisorTrap));
 
 
-
-    size_t cnt = 13;
-    int* bufferNumbers = (int*)mem_alloc(cnt * sizeof (int));
-    mem_free(bufferNumbers);
-
+    // size_t cnt = 19;
+    // int* bufferNumbers = (int*)mem_alloc(cnt * sizeof (int));
+    // print_ptr(bufferNumbers);
+    // print_char('\n');
+    //
+    // mem_free(bufferNumbers);
+    //
+    // size_t cnt2 = 13;
+    // int* bufferNumbers2 = (int*)mem_alloc(cnt2 * sizeof (int));
+    // print_ptr(bufferNumbers2);
+    // print_char('\n');
+    //
+    //
+    // mem_free(bufferNumbers2);
 
     TCB* threads[5];
     threads[0] = TCB::createThread(nullptr);

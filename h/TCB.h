@@ -52,7 +52,7 @@ private:
     friend class RiscV;
 
     static void threadWrapper();
-public:
+private:
     static void dispatch();
     static void contextSwitch(Context *oldContext, Context *newContext);
 
