@@ -54,18 +54,18 @@ void RiscV::handleTimerInterrupt() {
 
     TCB::timeSliceCounter++;
     if (TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
-        uint64 sepc = r_sepc();
-        uint64 sstatus = r_sstatus();
+        uint64 volatile sepc = r_sepc();
+        uint64 volatile sstatus = r_sstatus();
 
         TCB::timeSliceCounter = 0;
 
         TCB::dispatch();
 
-        w_sepc(sepc);
         w_sstatus(sstatus);
+        w_sepc(sepc);
     }
-    mc_sip(SIP_SSIP);
 
+    mc_sip(SIP_SSIP);
 }
 
 void RiscV::handleConsoleInterrupt() {

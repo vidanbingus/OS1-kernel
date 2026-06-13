@@ -10,6 +10,7 @@ TCB* TCB::createThread(Body body) {
 }
 
 void TCB::yield() {
+    __asm__ volatile ("li a0, 0x13");
     __asm__ volatile("ecall");
 }
 
