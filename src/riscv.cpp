@@ -62,6 +62,12 @@ void RiscV::handleSynchronousSysCalls() {
             __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
+        case THREAD_EXIT: {
+            TCB::running->setFinished(true);
+            TCB::toDelete = TCB::running;
+            TCB::dispatch();
+            break;
+        }
 
         case THREAD_DISPATCH: {
             TCB::timeSliceCounter=0;

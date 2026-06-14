@@ -1,8 +1,10 @@
 #include "../h/TCB.h"
 #include "../h/riscv.h"
+#include "../h/syscall_c.h"
 
 
 TCB* TCB::running = nullptr;
+TCB* TCB::toDelete = nullptr;
 uint64 TCB::timeSliceCounter = 0;
 
 TCB* TCB::createThread(Body body, void* arg, uint64* stack) {
@@ -15,16 +17,18 @@ void TCB::yield() {
 }
 
 void TCB::dispatch() {
+    if (toDelete != nullptr) {
+        toDelete->~TCB();
+        toDelete = nullptr;
+    }
     TCB* old = running;
     if (!old->isFinished()) { Scheduler::put(old); }
     running = Scheduler::get();
-
     TCB::contextSwitch(&old->context, &running->context);
 }
 
 void TCB::threadWrapper() {
     RiscV::extractSppSpie();
     running->body(running->arg);
-    running->setFinished(true);
-    TCB::yield();
+    thread_exit();
 }

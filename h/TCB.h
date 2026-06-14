@@ -4,12 +4,14 @@
 #include "../lib/hw.h"
 #include "../h/Scheduler.h"
 #include "../h/MemoryAllocator.h"
+#include "../h/print.h"
 
 class TCB {
 public:
 
     ~TCB() {
         if (stack != nullptr) {
+            print_string("Deallocating stack for thread\n");
             MemoryAllocator::mem_free(stack);
         }
     }
@@ -17,6 +19,7 @@ public:
     bool isFinished() const { return finished; }
     void setFinished(bool finished) { this->finished = finished; }
     uint64 getTimeSlice() const { return timeSlice; }
+    bool isMain() const { return isMainThread; }
 
     using Body = void (*) (void*);
 
@@ -26,6 +29,7 @@ public:
 
 public:
     static TCB* running;
+    static TCB* toDelete;
 
 private:
     // TCB(Body body, uint64 timeSlice) :
@@ -48,9 +52,13 @@ private:
                      stack != nullptr ? (uint64) &stack[DEFAULT_STACK_SIZE] : 0
                     }),
             timeSlice(DEFAULT_TIME_SLICE),
-            finished(false)
+            finished(false),
+            isMainThread(false)
     {
-        if (body!=nullptr) Scheduler::put(this);
+        if (body!=nullptr) {
+            isMainThread = true;
+            Scheduler::put(this);
+        }
     }
 
     struct Context {
@@ -63,6 +71,7 @@ private:
     Context context;
     uint64 timeSlice;
     bool finished;
+    bool isMainThread;
 
     static uint64 timeSliceCounter;
 

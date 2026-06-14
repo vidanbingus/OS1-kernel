@@ -60,6 +60,8 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
     register uint64 arg3 __asm__("a3") = (uint64)arg;           // Argument za tu funkciju npr. u a3
     register uint64 arg4 __asm__("a6") = stack_top;               // Vrh alociranog steka šaljemo kernelu u a4
 
+    //OVO RESENJE ZAVISI OD KOMPAJLERA!!!!!!!!!!1
+
 
     // 3. Ispaljujemo ecall u jednom jedinom bloku
     __asm__ volatile (
@@ -69,5 +71,26 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
         : "memory"                                        // Clobber: menjamo memoriju
     );
 
+    return (int)arg0;
+}
+
+void thread_dispatch() {
+    register uint64 arg0 __asm__("a0") = 0x13;    // opCode thread_dispatch je 0x13
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)
+        : "r" (arg0)
+        : "memory"
+    );
+}
+
+int thread_exit() {
+    register uint64 arg0 __asm__("a0") = 0x12; // opCode za thread_exit
+    __asm__ volatile (
+        "ecall"
+        : "=r"(arg0)
+        : "r"(arg0)
+        : "memory"
+    );
     return (int)arg0;
 }

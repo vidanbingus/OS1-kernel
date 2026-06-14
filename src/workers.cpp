@@ -2,6 +2,7 @@
 #include "../lib/hw.h"
 #include "../h/TCB.h"
 #include "../h/print.h"
+#include "../h/syscall_c.h"
 
 void workerBodyA(void* arg)
 {
@@ -9,6 +10,8 @@ void workerBodyA(void* arg)
         print_string("A: i=");
         print_int(i);
         print_string("\n");
+
+        if (i==7) thread_exit();
 
         for (uint64 j = 0; j < 10000; j++) {
             for (uint64 k = 0; k < 30000; k++) {
