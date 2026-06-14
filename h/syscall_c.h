@@ -13,9 +13,7 @@ int mem_free(void* ptr);
 
 //int thread_exit();
 
-int thread_create(thread_t* handle);
-
-int thread_create_actual(thread_t* handle,
+int thread_create(thread_t* handle,
                         void (*start_routine)(void*),
                         void* arg
                         );

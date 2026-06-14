@@ -3,7 +3,7 @@
 #include "../h/TCB.h"
 #include "../h/print.h"
 
-void workerBodyA()
+void workerBodyA(void* arg)
 {
     for (uint8 i = 0; i < 10; i++) {
         print_string("A: i=");
@@ -18,7 +18,7 @@ void workerBodyA()
     }
 }
 
-void workerBodyB()
+void workerBodyB(void* arg)
 {
     for (uint8 i = 0; i < 16; i++) {
         print_string("B: i=");
@@ -42,7 +42,7 @@ static uint64 fibonacci(uint64 n)
     return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-void workerBodyC()
+void workerBodyC(void* arg)
 {
     uint8 i = 0;
     for (; i < 3; i++)
@@ -79,7 +79,7 @@ void workerBodyC()
     TCB::yield();
 }
 
-void workerBodyD()
+void workerBodyD(void* arg)
 {
     uint8 i = 10;
     // thread_join((thread_t) arg);

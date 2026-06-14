@@ -38,25 +38,34 @@ int main() {
     // mem_free(bufferNumbers2);
 
     TCB* threads[5];
-    threads[0] = TCB::createThread(nullptr);
+    threads[0] = TCB::createThread(nullptr, nullptr, nullptr);
     TCB::running = threads[0];
 
-    threads[1] = TCB::createThread(workerBodyA);
-    print_string("Thread A created!\n");
-    threads[2] = TCB::createThread(workerBodyB);
-    print_string("Thread B created!\n");
-    threads[3] = TCB::createThread(workerBodyC);
-    print_string("Thread C created!\n");
-    threads[4] = TCB::createThread(workerBodyD);
-    print_string("Thread D created!\n");
+    // threads[1] = TCB::createThread(workerBodyA,nullptr);
+    // print_string("Thread A created!\n");
+    // threads[2] = TCB::createThread(workerBodyB, nullptr);
+    // print_string("Thread B created!\n");
+    // threads[3] = TCB::createThread(workerBodyC, nullptr);
+    // print_string("Thread C created!\n");
+    // threads[4] = TCB::createThread(workerBodyD, nullptr);
+    // print_string("Thread D created!\n");
+    thread_t t1, t2, t3, t4;
+    thread_create(&t1,workerBodyA, nullptr);
+    print_string("Thread A1 created!\n");
+    thread_create(&t2,workerBodyB, nullptr);
+    print_string("Thread B1 created!\n");
+    thread_create(&t3,workerBodyA, nullptr);
+    print_string("Thread A2 created!\n");
+    thread_create(&t4,workerBodyB, nullptr);
+    print_string("Thread B2 created!\n");
 
     // ukljuci prekide
     __asm__ volatile ("csrs sstatus, 0x02");
 
-    while (!(threads[1]->isFinished() &&
-            threads[2]->isFinished() &&
-            threads[3]->isFinished() &&
-            threads[4]->isFinished()))
+    while (!(t1->isFinished() &&
+            t2->isFinished() &&
+            t3->isFinished() &&
+            t4->isFinished()))
     {
         TCB::yield();
     }

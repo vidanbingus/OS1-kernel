@@ -4,6 +4,7 @@
 #include "../lib/hw.h"
 #include "../lib/console.h"
 #include "../h/TCB.h"
+#include "../h/syscall_c.h"
 
 class RiscV {
 public:

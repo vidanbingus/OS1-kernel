@@ -33,8 +33,36 @@ void RiscV::handleSynchronousSysCalls() {
             break;
         }
         case THREAD_CREATE: {
+            thread_t** handle;
+            TCB::Body body;
+            void* arg;
+            uint64* stack_top; // pazi: iz thread_create smo poslali VRH steka (stack_top)
+
+            __asm__ volatile ("mv %0, a1" : "=r" (handle));
+            __asm__ volatile ("mv %0, a2" : "=r" (body));
+            __asm__ volatile ("mv %0, a3" : "=r" (arg));
+            __asm__ volatile ("mv %0, a6" : "=r" (stack_top));
+
+            // Mala korekcija: Pošto ti je u a4 stigao VRH steka (stack_top = sp + DEFAULT_STACK_SIZE),
+            // a tvoj konstruktor želi pokazivač na POČETAK steka, moramo ga vratiti unazad:
+            // (Pod uslovom da je veličina u bajtovima DEFAULT_STACK_SIZE)
+            uint64* stack_start = (uint64*)((uint64)stack_top - DEFAULT_STACK_SIZE);
+
+
+            TCB* newThread = TCB::createThread(body, arg, stack_start);
+
+            int retValue = 0;
+
+            if (newThread == nullptr) {
+                retValue = -1;
+            } else {
+                *handle = (thread_t*)newThread;
+            }
+
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
+
         case THREAD_DISPATCH: {
             TCB::timeSliceCounter=0;
             TCB::dispatch();
