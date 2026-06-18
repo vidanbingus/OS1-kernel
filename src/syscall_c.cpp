@@ -94,3 +94,58 @@ int thread_exit() {
     );
     return (int)arg0;
 }
+
+int sem_open(sem_t *handle, unsigned init) {
+    register uint64 arg0 __asm__("a0") = 0x21;                    // opCode za SEM_OPEN je 0x21
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    register uint64 arg2 __asm__("a2") = (uint64)init;
+
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
+        : "r" (arg0), "r" (arg1), "r" (arg2)                // Ulazi: svi ovi registri moraju biti napunjeni
+        : "memory"                                        // Clobber: menjamo memoriju
+    );
+
+    return (int)arg0;
+}
+
+int sem_close(sem_t handle) {
+    register uint64 arg0 __asm__("a0") = 0x22;                    // opCode za SEM_CLOSE je 0x22
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
+        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
+        : "memory"                                        // Clobber: menjamo memoriju
+    );
+
+    return (int)arg0;
+}
+
+int sem_wait(sem_t handle) {
+    register uint64 arg0 __asm__("a0") = 0x23;              //opCode za SEM_WAIT je 0x23
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
+        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
+        : "memory"                                        // Clobber: menjamo memoriju
+    );
+
+    return (int)arg0;
+}
+
+int sem_signal(sem_t handle) {
+    register uint64 arg0 __asm__("a0") = 0x24;              //opCode za SEM_SIGNAL je 0x24
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
+        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
+        : "memory"                                        // Clobber: menjamo memoriju
+    );
+
+    return (int)arg0;
+}

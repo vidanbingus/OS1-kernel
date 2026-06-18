@@ -12,11 +12,10 @@ void RiscV::handleSynchronousSysCalls() {
     uint64 volatile sepc = r_sepc() + 4;
     uint64 volatile sstatus = r_sstatus();
 
-    uint64 opCode;
-    __asm__ volatile ("mv %0, a0" : "=r" (opCode));
-
     void* ptr;
 
+    uint64 opCode;
+    __asm__ volatile ("mv %0, a0" : "=r" (opCode));
     switch (opCode) {
 
         case MEM_ALLOC: {
@@ -72,6 +71,42 @@ void RiscV::handleSynchronousSysCalls() {
         case THREAD_DISPATCH: {
             TCB::timeSliceCounter=0;
             TCB::dispatch();
+            break;
+        }
+        case SEM_OPEN: {
+            sem_t** handle;
+            uint64 semValue;
+            __asm__ volatile ("mv %0, a1" : "=r" (handle));
+            __asm__ volatile ("mv %0, a2" : "=r" (semValue));
+            _sem* semaphore = new _sem((unsigned)semValue);
+
+            int retValue = 0;
+            if (!semaphore) { retValue = -1;}
+            else {
+                *handle = (sem_t*)semaphore;
+            }
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
+            break;
+        }
+        case SEM_CLOSE: {
+            sem_t handle;
+            __asm__ volatile ("mv %0, a1" : "=r" (handle));
+            int retValue = handle->close();
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
+            break;
+        }
+        case SEM_WAIT: {
+            sem_t handle;
+            __asm__ volatile ("mv %0, a1" : "=r" (handle));
+            int retValue = handle->wait();
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
+            break;
+        }
+        case SEM_SIGNAL: {
+            sem_t handle;
+            __asm__ volatile ("mv %0, a1" : "=r" (handle));
+            int retValue = handle->signal();
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
         default:

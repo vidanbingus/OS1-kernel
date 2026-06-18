@@ -11,13 +11,13 @@ public:
 
     ~TCB() {
         if (stack != nullptr) {
-            print_string("Deallocating stack for thread\n");
             MemoryAllocator::mem_free(stack);
         }
     }
 
     bool isFinished() const { return finished; }
     void setFinished(bool finished) { this->finished = finished; }
+    void setBlocked(bool blocked) { this->isBlocked = blocked; }
     uint64 getTimeSlice() const { return timeSlice; }
     bool isMain() const { return isMainThread; }
 
@@ -53,7 +53,8 @@ private:
                     }),
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
-            isMainThread(false)
+            isMainThread(false),
+            isBlocked(false)
     {
         if (body!=nullptr) {
             isMainThread = true;
@@ -72,6 +73,7 @@ private:
     uint64 timeSlice;
     bool finished;
     bool isMainThread;
+    bool isBlocked;
 
     static uint64 timeSliceCounter;
 
