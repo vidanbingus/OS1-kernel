@@ -21,12 +21,18 @@ public:
     void setBlocked(bool blocked) { this->isBlocked = blocked; }
     uint64 getTimeSlice() const { return timeSlice; }
     bool isMain() const { return isMainThread; }
+    bool wasSemClosed() const { return semClosedWhileWaiting; }
+    void setSemClosed(bool b) { semClosedWhileWaiting = b; }
 
     using Body = void (*) (void*);
 
     static TCB* createThread(Body body, void* arg, uint64* stack);
 
     static void yield();
+
+    static void sleep(time_t ticks);
+    static void tick();
+    static TCB* createKernelThread(Body body, void* arg);
 
 public:
     static TCB* running;
@@ -45,7 +51,7 @@ private:
     //     if (body!=nullptr) Scheduler::put(this);
     // }
 
-    TCB(Body body, void* arg, uint64* stack) :
+    TCB(Body body, void* arg, uint64* stack, bool kernel = false) :
             body(body),
             arg(arg),
             stack(body != nullptr ? stack : nullptr),
@@ -55,7 +61,10 @@ private:
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
             isMainThread(false),
-            isBlocked(false)
+            isBlocked(false),
+            isKernelThread(kernel),
+            wakeTime(0),
+            nextSleeper(nullptr)
     {
         if (body!=nullptr) {
             isMainThread = true;
@@ -75,8 +84,14 @@ private:
     bool finished;
     bool isMainThread;
     bool isBlocked;
+    bool semClosedWhileWaiting = false;
+    bool isKernelThread;     // za konzolu (Korak B); zasad uvek false
+    uint64 wakeTime;         // tik na koji nit treba probuditi
+    TCB* nextSleeper;        // ulancavanje u listi uspavanih
 
     static uint64 timeSliceCounter;
+    static TCB* sleepHead;
+    static uint64 systemTime;
 
     // static uint64 constexpr STACK_SIZE = 1024;
     // static uint64 constexpr TIME_SLICE = 2;

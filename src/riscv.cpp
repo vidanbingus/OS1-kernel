@@ -110,6 +110,14 @@ void RiscV::handleSynchronousSysCalls() {
             __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
+        case TIME_SLEEP: {
+            uint64 t;
+            __asm__ volatile ("mv %0, a1" : "=r" (t));
+            TCB::sleep(t);
+            uint64 retValue = 0;
+            __asm__ volatile ("mv a0, %0" : : "r" (retValue));
+            break;
+        }
         case PUTC: {
             uint64 ch;
             __asm__ volatile ("mv %0, a1" : "=r" (ch));
@@ -131,7 +139,7 @@ void RiscV::handleSynchronousSysCalls() {
 }
 
 void RiscV::handleTimerInterrupt() {
-    //verovatno ce trebati ovde da se desava promena konteksta
+    TCB::tick();
 
     TCB::timeSliceCounter++;
     if (TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {

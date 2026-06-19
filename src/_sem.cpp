@@ -13,8 +13,13 @@ int _sem::wait() {
     if (!isOpen) {return -1;}
     if (--val < 0) {
         TCB::running->setBlocked(true);
+        TCB::running->setSemClosed(false);
         blockedThreads.addLast(TCB::running);
         TCB::dispatch();
+        if (TCB::running->wasSemClosed()) {     // probudio nas close()
+            TCB::running->setSemClosed(false);
+            return -1;
+        }
     }
     return 0;
 }
@@ -36,6 +41,7 @@ int _sem::close() {
     while (blockedThreads.peekFirst()) {
         TCB* tcb = blockedThreads.removeFirst();
         tcb->setBlocked(false);
+        tcb->setSemClosed(true);
         Scheduler::put(tcb);
     }
     return 0;

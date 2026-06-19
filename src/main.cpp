@@ -19,8 +19,25 @@ public:
 protected:
     void run() override {
         for (int i = 0; i < 20; i++) {
+            time_sleep(10);
             Console::putc(ch);
-            for (volatile uint64 j = 0; j < 30000000; j++) { }
+            for (volatile uint64 j = 0; j < 3000000; j++) { }
+        }
+        done->signal();
+    }
+private:
+    char ch;
+};
+
+class Worker2 : public Thread {
+public:
+    Worker2(char c) : Thread(), ch(c) {}
+protected:
+    void run() override {
+        for (int i = 0; i < 20; i++) {
+            time_sleep(30);
+            Console::putc(ch);
+            for (volatile uint64 j = 0; j < 3000000; j++) { }
         }
         done->signal();
     }
@@ -33,7 +50,7 @@ void userMain(void* arg) {
     done = new Semaphore(0);          // globalni new -> syscall mem_alloc
 
     Worker w1('A');
-    Worker w2('B');
+    Worker2 w2('B');
     w1.start();
     w2.start();
 

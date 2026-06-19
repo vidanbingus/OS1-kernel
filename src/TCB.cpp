@@ -6,6 +6,8 @@
 TCB* TCB::running = nullptr;
 TCB* TCB::toDelete = nullptr;
 uint64 TCB::timeSliceCounter = 0;
+TCB* TCB::sleepHead = nullptr;
+uint64 TCB::systemTime = 0;
 
 TCB* TCB::createThread(Body body, void* arg, uint64* stack) {
     return new TCB(body,arg, stack);
@@ -31,4 +33,36 @@ void TCB::threadWrapper() {
     RiscV::extractSppSpie();
     running->body(running->arg);
     thread_exit();
+}
+
+void TCB::sleep(time_t ticks) {
+    if (ticks == 0) return;                  // ne uspavljuj na 0 perioda
+
+    running->wakeTime = systemTime + ticks;
+    running->setBlocked(true);
+
+    // sortirano umetanje u listu uspavanih (po vremenu budjenja)
+    TCB* prev = nullptr;
+    TCB* curr = sleepHead;
+    while (curr != nullptr && curr->wakeTime <= running->wakeTime) {
+        prev = curr;
+        curr = curr->nextSleeper;
+    }
+    running->nextSleeper = curr;
+    if (prev) prev->nextSleeper = running;
+    else
+        sleepHead = running;
+
+    dispatch();                              // SIE je vec 0 (pozvano iz obrade ecall-a)
+}
+
+void TCB::tick() {
+    systemTime++;
+    while (sleepHead != nullptr && sleepHead->wakeTime <= systemTime) {
+        TCB* t = sleepHead;
+        sleepHead = sleepHead->nextSleeper;
+        t->nextSleeper = nullptr;
+        t->setBlocked(false);
+        Scheduler::put(t);
+    }
 }
