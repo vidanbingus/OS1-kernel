@@ -7,26 +7,43 @@
 #include "../h/workers.h"
 #include "../h/_sem.h"
 #include "../test/buffer.h"
+#include "../h/syscall_cpp.h"
+
 extern "C" void supervisorTrap(void);
 
+static Semaphore* done;
 
-static void busyWork(void* arg) {
-    const char* tag = (const char*)arg;
-    while (true) {
-        print_string(tag);
-        for (volatile uint64 j = 0; j < 5000000; j++) { /* busy wait */ }
+class Worker : public Thread {
+public:
+    Worker(char c) : Thread(), ch(c) {}
+protected:
+    void run() override {
+        for (int i = 0; i < 20; i++) {
+            Console::putc(ch);
+            for (volatile uint64 j = 0; j < 30000000; j++) { }
+        }
+        done->signal();
     }
-}
+private:
+    char ch;
+};
 
 void userMain(void* arg) {
-    thread_t a, b;
-    thread_create(&a, busyWork, (void*)"A");
-    thread_create(&b, busyWork, (void*)"B");
-    while (true) {
-        print_string("M");
-        for (volatile uint64 j = 0; j < 5000000; j++) { /* busy wait */ }
-    }
+    print_string("\nC++ API test start\n");
+    done = new Semaphore(0);          // globalni new -> syscall mem_alloc
+
+    Worker w1('A');
+    Worker w2('B');
+    w1.start();
+    w2.start();
+
+    done->wait();
+    done->wait();                     // cekaj da obe niti zavrse
+
+    print_string("\nC++ API test done\n");
+    delete done;                      // ~Semaphore -> sem_close; globalni delete -> syscall mem_free
 }
+
 
 int main() {
 
@@ -49,6 +66,10 @@ int main() {
     buffer2 = (char*)mem_alloc(30);
     print_ptr(buffer2);
     print_char('\n');
+    char* buffer3;
+    buffer3 = (char*)mem_alloc(30);
+    print_ptr(buffer3);
+    print_char('\n');
 
     mem_free(buffer);
     mem_free(buffer2);
@@ -59,7 +80,7 @@ int main() {
     TCB::running = threads[0];
 
     thread_t t1;
-    thread_create(&t1,&workerBodyA, nullptr);
+    thread_create(&t1,&userMain, nullptr);
     print_string("Thread user1 created!\n");
     // thread_create(&t2,&userMain, nullptr);
     // print_string("Thread user2 created!\n");

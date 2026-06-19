@@ -17,7 +17,7 @@ void TCB::yield() {
 }
 
 void TCB::dispatch() {
-    if (toDelete != nullptr) {
+    if (toDelete != nullptr && toDelete!=running) {
         delete toDelete;
         toDelete = nullptr;
     }

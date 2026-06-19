@@ -149,3 +149,22 @@ int sem_signal(sem_t handle) {
 
     return (int)arg0;
 }
+
+int time_sleep(time_t t) {
+    register uint64 arg0 __asm__("a0") = 0x31;
+    register uint64 arg1 __asm__("a1") = (uint64)t;
+    __asm__ volatile ("ecall" : "=r"(arg0) : "r"(arg0), "r"(arg1) : "memory");
+    return (int)arg0;
+}
+
+char getc() {
+    register uint64 arg0 __asm__("a0") = 0x41;
+    __asm__ volatile ("ecall" : "=r"(arg0) : "r"(arg0) : "memory");
+    return (char)arg0;
+}
+
+void putc(char c) {
+    register uint64 arg0 __asm__("a0") = 0x42;
+    register uint64 arg1 __asm__("a1") = (uint64)c;
+    __asm__ volatile ("ecall" : "=r"(arg0) : "r"(arg0), "r"(arg1) : "memory");
+}

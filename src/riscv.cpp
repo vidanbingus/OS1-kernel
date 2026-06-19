@@ -92,6 +92,7 @@ void RiscV::handleSynchronousSysCalls() {
             sem_t handle;
             __asm__ volatile ("mv %0, a1" : "=r" (handle));
             int retValue = handle->close();
+            delete handle;
             __asm__ volatile ("mv a0, %0" : : "r" (retValue));
             break;
         }
@@ -107,6 +108,17 @@ void RiscV::handleSynchronousSysCalls() {
             __asm__ volatile ("mv %0, a1" : "=r" (handle));
             int retValue = handle->signal();
             __asm__ volatile ("mv a0, %0" : : "r" (retValue));
+            break;
+        }
+        case PUTC: {
+            uint64 ch;
+            __asm__ volatile ("mv %0, a1" : "=r" (ch));
+            __putc((char)ch);
+            break;
+        }
+        case GETC: {
+            char ch = __getc();
+            __asm__ volatile ("mv a0, %0" : : "r" ((uint64)ch));
             break;
         }
         default:

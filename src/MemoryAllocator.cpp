@@ -40,7 +40,7 @@ void* MemoryAllocator::mem_alloc(size_t size) {
                 else
                     freeMemHead = curr->next;
             }
-
+            curr->size = blocksNeeded;
             curr->next = nullptr;                   // curr sad predstavlja slobodan segment
             return (char*)curr + MEM_BLOCK_SIZE;    // vraca se pokazivac na deo memorije odmah nakon zaglavlja
         }
