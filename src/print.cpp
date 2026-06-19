@@ -1,10 +1,10 @@
 #include "../h/print.h"
 
 #include "../h/riscv.h"
-#include "../lib/console.h"
+#include "../h/syscall_c.h"
 
 int print_char(char ch) {
-    __putc(ch);
+    putc(ch);
     return 0;
 }
 
@@ -12,21 +12,21 @@ int print_string(const char* str) {
     uint64 sstatus = RiscV::r_sstatus();
     RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
     while (*str != '\0') {
-        __putc(*(str++));
+        putc(*(str++));
     }
     RiscV::ms_sstatus(sstatus & RiscV::SSTATUS_SIE ? RiscV::SSTATUS_SIE : 0);
     return 0;
 }
 
 int print_ptr(const void* ptr) {
-    __putc('0');
-    __putc('x');
+    putc('0');
+    putc('x');
     return print_size(size_t(ptr), 16);
 }
 
 int print_size(size_t val, uint8 base) {
     if (val == 0) {
-        __putc('0');
+        putc('0');
         return 0;
     }
 
@@ -42,7 +42,7 @@ int print_size(size_t val, uint8 base) {
         val = val / base;
     }
     while (count != 0) {
-        __putc(digits[buffer[--count]]);
+        putc(digits[buffer[--count]]);
     }
     return 0;
 }
@@ -52,7 +52,7 @@ int print_int(int val, uint8 base)
     uint64 sstatus = RiscV::r_sstatus();
     RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
     if (val < 0) {
-        __putc('-');
+        putc('-');
         val = -val;
     }
 

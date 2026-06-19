@@ -1,6 +1,7 @@
 #include "../h/riscv.h"
 #include "../h/opCodes.h"
 #include "../h/MemoryAllocator.h"
+#include "../h/KConsole.h"
 
 void RiscV::extractSppSpie() {
     __asm__ volatile ("csrw sepc, ra");
@@ -121,11 +122,11 @@ void RiscV::handleSynchronousSysCalls() {
         case PUTC: {
             uint64 ch;
             __asm__ volatile ("mv %0, a1" : "=r" (ch));
-            __putc((char)ch);
+            KConsole::putc((char)ch);
             break;
         }
         case GETC: {
-            char ch = __getc();
+            char ch = KConsole::getc();
             __asm__ volatile ("mv a0, %0" : : "r" ((uint64)ch));
             break;
         }
@@ -159,6 +160,6 @@ void RiscV::handleTimerInterrupt() {
 
 void RiscV::handleConsoleInterrupt() {
 
-    console_handler();
+    KConsole::handleInterrupt();
 }
 

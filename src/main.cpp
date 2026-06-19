@@ -1,4 +1,3 @@
-#include "../lib/console.h"
 #include "../h/riscv.h"
 #include "../h/syscall_c.h"
 #include "../h/MemoryAllocator.h"
@@ -8,6 +7,7 @@
 #include "../h/_sem.h"
 #include "../test/buffer.h"
 #include "../h/syscall_cpp.h"
+#include "../h/KConsole.h"
 
 extern "C" void supervisorTrap(void);
 
@@ -19,7 +19,7 @@ public:
 protected:
     void run() override {
         for (int i = 0; i < 20; i++) {
-            time_sleep(10);
+            time_sleep(2);
             Console::putc(ch);
             for (volatile uint64 j = 0; j < 3000000; j++) { }
         }
@@ -29,28 +29,13 @@ private:
     char ch;
 };
 
-class Worker2 : public Thread {
-public:
-    Worker2(char c) : Thread(), ch(c) {}
-protected:
-    void run() override {
-        for (int i = 0; i < 20; i++) {
-            time_sleep(30);
-            Console::putc(ch);
-            for (volatile uint64 j = 0; j < 3000000; j++) { }
-        }
-        done->signal();
-    }
-private:
-    char ch;
-};
 
 void userMain(void* arg) {
     print_string("\nC++ API test start\n");
     done = new Semaphore(0);          // globalni new -> syscall mem_alloc
 
     Worker w1('A');
-    Worker2 w2('B');
+    Worker w2('B');
     w1.start();
     w2.start();
 
@@ -59,21 +44,24 @@ void userMain(void* arg) {
 
     print_string("\nC++ API test done\n");
     delete done;                      // ~Semaphore -> sem_close; globalni delete -> syscall mem_free
+    char c = getc();
+    putc(c);
+    putc('\n');
 }
 
 
 int main() {
 
-    print_string("-----------\n");
-
     MemoryAllocator::init();
-    print_ptr(HEAP_START_ADDR);
-    print_char('\n');
-
 
     // u IVTP stavi pocetnu adresu prekidnih rutina
     //__asm__ volatile ("csrw stvec, %0" : : "r" ((uint64)&supervisorTrap));
     RiscV::w_stvec((uint64)&supervisorTrap);
+    KConsole::init();
+
+    print_string("-----------\n");
+    print_ptr(HEAP_START_ADDR);
+    print_char('\n');
 
     char* buffer;
     buffer = (char*)mem_alloc(30);
@@ -120,6 +108,7 @@ int main() {
     print_ptr(buffer);
     print_char('\n');
     mem_free(buffer);
+
 
     print_string("Finished!\n");
 

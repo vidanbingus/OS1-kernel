@@ -30,9 +30,16 @@ void TCB::dispatch() {
 }
 
 void TCB::threadWrapper() {
-    RiscV::extractSppSpie();
+    if (!running->isKernelThread)
+        RiscV::extractSppSpie();
     running->body(running->arg);
     thread_exit();
+}
+
+TCB* TCB::createKernelThread(Body body, void* arg) {
+    uint64* stack = (uint64*)MemoryAllocator::mem_alloc(DEFAULT_STACK_SIZE);
+    if (stack == nullptr) return nullptr;
+    return new TCB(body, arg, stack, true);
 }
 
 void TCB::sleep(time_t ticks) {

@@ -5,6 +5,9 @@
       <file path="$PROJECT_DIR$/h" />
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/build" />
+    </excludeRoots>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MakefileSettings">
