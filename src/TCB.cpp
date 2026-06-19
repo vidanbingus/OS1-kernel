@@ -22,7 +22,7 @@ void TCB::dispatch() {
         toDelete = nullptr;
     }
     TCB* old = running;
-    if (!old->isFinished()) { Scheduler::put(old); }
+    if (!old->isFinished() && !old->isBlocked) { Scheduler::put(old); }
     running = Scheduler::get();
     TCB::contextSwitch(&old->context, &running->context);
 }

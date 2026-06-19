@@ -49,7 +49,7 @@ private:
             arg(arg),
             stack(body != nullptr ? stack : nullptr),
             context({(uint64) &threadWrapper,
-                     stack != nullptr ? (uint64) &stack[DEFAULT_STACK_SIZE] : 0
+                     stack != nullptr ? (uint64) ((char*)stack + DEFAULT_STACK_SIZE) : 0
                     }),
             timeSlice(DEFAULT_TIME_SLICE),
             finished(false),
@@ -81,6 +81,7 @@ private:
     // static uint64 constexpr TIME_SLICE = 2;
 
     friend class RiscV;
+    friend class _sem;
 
     static void threadWrapper();
 private:

@@ -2,7 +2,7 @@
 
 #include "../h/syscall_c.h"
 
-_sem::_sem(unsigned initVal) : val(initVal), isOpen(false) {}
+_sem::_sem(unsigned initVal) : val(initVal), isOpen(true) {}
 
 int _sem::open(_sem** semHandle, unsigned int val) {
     *semHandle = new _sem(val);
@@ -14,7 +14,7 @@ int _sem::wait() {
     if (--val < 0) {
         TCB::running->setBlocked(true);
         blockedThreads.addLast(TCB::running);
-        thread_dispatch();
+        TCB::dispatch();
     }
     return 0;
 }
