@@ -1,10 +1,11 @@
 #ifndef PROJECT_BASE__SEM_H
 #define PROJECT_BASE__SEM_H
+#include "KernelObject.h"
 #include "list.h"
 #include "TCB.h"
 
 
-class _sem {
+class _sem : public KernelObject {
 
 public:
     _sem(unsigned initVal);

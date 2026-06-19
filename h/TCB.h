@@ -5,8 +5,9 @@
 #include "../h/Scheduler.h"
 #include "../h/MemoryAllocator.h"
 #include "../h/print.h"
+#include "../h/KernelObject.h"
 
-class TCB {
+class TCB : public KernelObject {
 public:
 
     ~TCB() {

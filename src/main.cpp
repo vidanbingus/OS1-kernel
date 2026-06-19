@@ -10,115 +10,22 @@
 extern "C" void supervisorTrap(void);
 
 
-struct thread_data {
-    int id;
-    Buffer *buffer;
-    sem_t wait;
-};
-
-static volatile int threadEnd = 0;
-
-static void producerKeyboard(void *arg) {
-    struct thread_data *data = (struct thread_data *) arg;
-
-    int key;
-    int i = 0;
-    while ((key = __getc()) != 0x1b) {
-        data->buffer->put(key);
-        i++;
-
-        if (i % (10 * data->id) == 0) {
-            thread_dispatch();
-        }
+static void busyWork(void* arg) {
+    const char* tag = (const char*)arg;
+    while (true) {
+        print_string(tag);
+        for (volatile uint64 j = 0; j < 5000000; j++) { /* busy wait */ }
     }
-
-    threadEnd = 1;
-    data->buffer->put('!');
-
-    sem_signal(data->wait);
 }
-
-static void producer(void *arg) {
-    struct thread_data *data = (struct thread_data *) arg;
-
-    int i = 0;
-    while (!threadEnd) {
-        data->buffer->put(data->id + '0');
-        i++;
-
-        if (i % (10 * data->id) == 0) {
-            thread_dispatch();
-        }
-    }
-
-    sem_signal(data->wait);
-}
-
-static void consumer(void *arg) {
-    struct thread_data *data = (struct thread_data *) arg;
-
-    int i = 0;
-    while (!threadEnd) {
-        int key = data->buffer->get();
-        i++;
-
-        __putc(key);
-
-        if (i % (5 * data->id) == 0) {
-            thread_dispatch();
-        }
-
-        if (i % 80 == 0) {
-            __putc('\n');
-        }
-    }
-
-    while (data->buffer->getCnt() > 0) {
-        int key = data->buffer->get();
-        __putc(key);
-    }
-
-    sem_signal(data->wait);
-}
-
 
 void userMain(void* arg) {
-    int cap = 200;
-    int numOfProducers = 6;
-
-    static sem_t waitForAll;
-
-    Buffer* buffer = new Buffer(cap);
-    sem_open(&waitForAll,0);
-    thread_t threads[numOfProducers];
-    thread_t consumerThread;
-    struct thread_data data[numOfProducers+1];
-
-    data[numOfProducers].id = numOfProducers;
-    data[numOfProducers].buffer = buffer;
-    data[numOfProducers].wait = waitForAll;
-    thread_create(&consumerThread, consumer, data + numOfProducers);
-
-
-    for (int i = 0; i < numOfProducers; i++) {
-        data[i].id = i;
-        data[i].buffer = buffer;
-        data[i].wait = waitForAll;
-
-        thread_create(threads + i,
-                      i > 0 ? producer : producerKeyboard,
-                      data + i);
+    thread_t a, b;
+    thread_create(&a, busyWork, (void*)"A");
+    thread_create(&b, busyWork, (void*)"B");
+    while (true) {
+        print_string("M");
+        for (volatile uint64 j = 0; j < 5000000; j++) { /* busy wait */ }
     }
-
-    thread_dispatch();
-
-    for (int i = 0; i <= numOfProducers; i++) {
-        sem_wait(waitForAll);
-    }
-
-    sem_close(waitForAll);
-
-    delete buffer;
 }
 
 int main() {
@@ -130,11 +37,21 @@ int main() {
     print_char('\n');
 
 
-
     // u IVTP stavi pocetnu adresu prekidnih rutina
     //__asm__ volatile ("csrw stvec, %0" : : "r" ((uint64)&supervisorTrap));
     RiscV::w_stvec((uint64)&supervisorTrap);
 
+    char* buffer;
+    buffer = (char*)mem_alloc(30);
+    print_ptr(buffer);
+    print_char('\n');
+    char* buffer2;
+    buffer2 = (char*)mem_alloc(30);
+    print_ptr(buffer2);
+    print_char('\n');
+
+    mem_free(buffer);
+    mem_free(buffer2);
 
     TCB* threads[2];
 
@@ -142,11 +59,15 @@ int main() {
     TCB::running = threads[0];
 
     thread_t t1;
-    thread_create(&t1,&userMain, nullptr);
+    thread_create(&t1,&workerBodyA, nullptr);
     print_string("Thread user1 created!\n");
     // thread_create(&t2,&userMain, nullptr);
     // print_string("Thread user2 created!\n");
 
+    buffer = (char*)mem_alloc(30);
+    print_ptr(buffer);
+    print_char('\n');
+    mem_free(buffer);
 
     // ukljuci prekide
     //__asm__ volatile ("csrs sstatus, 0x02");
@@ -157,6 +78,10 @@ int main() {
     {
         thread_dispatch();
     }
+    buffer = (char*)mem_alloc(30);
+    print_ptr(buffer);
+    print_char('\n');
+    mem_free(buffer);
 
     print_string("Finished!\n");
 

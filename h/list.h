@@ -1,12 +1,12 @@
 #ifndef PROJECT_BASE_LIST_H
 #define PROJECT_BASE_LIST_H
-
+#include "../h/KernelObject.h"
 
 template<typename T>
 class List
 {
 private:
-    struct Elem {
+    struct Elem : public KernelObject {
         T *data;
         Elem *next;
 
