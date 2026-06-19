@@ -1,0 +1,6 @@
+#ifndef PROJECT_BASE_TESTMAIN_H
+#define PROJECT_BASE_TESTMAIN_H
+
+void userMain(void*);
+
+#endif //PROJECT_BASE_TESTMAIN_H

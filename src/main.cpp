@@ -8,46 +8,11 @@
 #include "../test/buffer.h"
 #include "../h/syscall_cpp.h"
 #include "../h/KConsole.h"
+#include "../test/TestMain.h"
 
 extern "C" void supervisorTrap(void);
 
-static Semaphore* done;
-
-class Worker : public Thread {
-public:
-    Worker(char c) : Thread(), ch(c) {}
-protected:
-    void run() override {
-        for (int i = 0; i < 20; i++) {
-            time_sleep(2);
-            Console::putc(ch);
-            for (volatile uint64 j = 0; j < 3000000; j++) { }
-        }
-        done->signal();
-    }
-private:
-    char ch;
-};
-
-
-void userMain(void* arg) {
-    print_string("\nC++ API test start\n");
-    done = new Semaphore(0);          // globalni new -> syscall mem_alloc
-
-    Worker w1('A');
-    Worker w2('B');
-    w1.start();
-    w2.start();
-
-    done->wait();
-    done->wait();                     // cekaj da obe niti zavrse
-
-    print_string("\nC++ API test done\n");
-    delete done;                      // ~Semaphore -> sem_close; globalni delete -> syscall mem_free
-    char c = getc();
-    putc(c);
-    putc('\n');
-}
+extern void userMain(void*);
 
 
 int main() {
@@ -59,26 +24,6 @@ int main() {
     RiscV::w_stvec((uint64)&supervisorTrap);
     KConsole::init();
 
-    print_string("-----------\n");
-    print_ptr(HEAP_START_ADDR);
-    print_char('\n');
-
-    char* buffer;
-    buffer = (char*)mem_alloc(30);
-    print_ptr(buffer);
-    print_char('\n');
-    char* buffer2;
-    buffer2 = (char*)mem_alloc(30);
-    print_ptr(buffer2);
-    print_char('\n');
-    char* buffer3;
-    buffer3 = (char*)mem_alloc(30);
-    print_ptr(buffer3);
-    print_char('\n');
-
-    mem_free(buffer);
-    mem_free(buffer2);
-
     TCB* threads[2];
 
     thread_create(&threads[0], nullptr, nullptr);
@@ -86,14 +31,6 @@ int main() {
 
     thread_t t1;
     thread_create(&t1,&userMain, nullptr);
-    print_string("Thread user1 created!\n");
-    // thread_create(&t2,&userMain, nullptr);
-    // print_string("Thread user2 created!\n");
-
-    buffer = (char*)mem_alloc(30);
-    print_ptr(buffer);
-    print_char('\n');
-    mem_free(buffer);
 
     // ukljuci prekide
     //__asm__ volatile ("csrs sstatus, 0x02");
@@ -104,14 +41,6 @@ int main() {
     {
         thread_dispatch();
     }
-    buffer = (char*)mem_alloc(30);
-    print_ptr(buffer);
-    print_char('\n');
-    mem_free(buffer);
-
-
-    print_string("Finished!\n");
-
 
     return 0;
 };
