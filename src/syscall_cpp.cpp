@@ -31,14 +31,14 @@ int Semaphore::wait() {
 int Semaphore::signal()  { return sem_signal(myHandle); }
 
 PeriodicThread::PeriodicThread(time_t period)
-        : Thread(), period(period), finished(false) {}
+        : Thread(), period(period) {}
 
-void PeriodicThread::terminate() { finished = true; }
+void PeriodicThread::terminate() { myHandle->requestTerminate(); }
 
 void PeriodicThread::run() {
-    while (!finished) {
+    while (!myHandle->isTerminateRequested()) {
         periodicActivation();
-        if (!finished) sleep(period);
+        if (!myHandle->isTerminateRequested()) sleep(period);
     }
 }
 

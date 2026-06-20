@@ -23,6 +23,8 @@ public:
     bool isMain() const { return isMainThread; }
     bool wasSemClosed() const { return semClosedWhileWaiting; }
     void setSemClosed(bool b) { semClosedWhileWaiting = b; }
+    void requestTerminate() { terminateRequested = true; }
+    bool isTerminateRequested() const { return terminateRequested; }
 
     using Body = void (*) (void*);
 
@@ -85,7 +87,8 @@ private:
     bool isMainThread;
     bool isBlocked;
     bool semClosedWhileWaiting = false;
-    bool isKernelThread;     // za konzolu (Korak B); zasad uvek false
+    bool terminateRequested = false;
+    bool isKernelThread;     // za konzolu
     uint64 wakeTime;         // tik na koji nit treba probuditi
     TCB* nextSleeper;        // ulancavanje u listi uspavanih
 

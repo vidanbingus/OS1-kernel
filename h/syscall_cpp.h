@@ -15,8 +15,8 @@ public:
 protected:
     Thread();
     virtual void run() {}
-private:
     thread_t myHandle;
+private:
     void (*body)(void*);
     void* arg;
     static void wrapper(void*);          // pokrece body ili run
@@ -41,7 +41,6 @@ protected:
     void run() override;                 // override Thread::run (ne menja set virtuala)
 private:
     time_t period;
-    bool finished;
 };
 
 class Console {
