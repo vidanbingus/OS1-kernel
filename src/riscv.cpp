@@ -3,8 +3,59 @@
 #include "../h/MemoryAllocator.h"
 #include "../h/KConsole.h"
 
+// --- panic ispis: direktno na konzolni kontroler, bez sistemskih poziva/semafora ---
+static void panicPutc(char c) {
+    while (!(*(volatile uint8*)CONSOLE_STATUS & CONSOLE_TX_STATUS_BIT)) { }
+    *(volatile char*)CONSOLE_TX_DATA = c;
+}
+
+static void panicPrint(const char* s) {
+    while (*s) panicPutc(*s++);
+}
+
+static void panicPrintHex(uint64 v) {
+    panicPrint("0x");
+    const char* d = "0123456789ABCDEF";
+    bool started = false;
+    for (int i = 60; i >= 0; i -= 4) {
+        uint8 nib = (v >> i) & 0xF;
+        if (nib) started = true;
+        if (started || i == 0) panicPutc(d[nib]);
+    }
+}
+
+void RiscV::handleUnknownTrap() {
+    uint64 scause  = r_scause();
+    uint64 sepc    = r_sepc();
+    uint64 stval   = r_stval();
+    uint64 sstatus = r_sstatus();
+
+    bool fromUser = (sstatus & SSTATUS_SPP) == 0;   // SPP=0 -> trap je dosao iz korisnickog rezima
+
+    panicPrint("\n*** TRAP: neocekivan uzrok ***\n");
+    panicPrint("  scause = "); panicPrintHex(scause); panicPrint("\n");
+    panicPrint("  sepc   = "); panicPrintHex(sepc);   panicPrint("\n");
+    panicPrint("  stval  = "); panicPrintHex(stval);  panicPrint("\n");
+
+    if (!fromUser) {
+        // Greska u sistemskom rezimu (jezgro, idle/main, konzolna nit) -> nema oporavka.
+        panicPrint("  -> greska u jezgru, zaustavljam sistem\n");
+        *((volatile uint32*)0x100000) = 0x5555;
+        while (true) { }
+    }
+
+    // SOFT: pukla je korisnicka nit -> ugasi samo nju i nastavi (isto kao thread_exit).
+    panicPrint("  -> gasim nit koja je pukla i nastavljam\n");
+    TCB::running->setFinished(true);
+    TCB::toDelete = TCB::running;
+    TCB::dispatch();
+}
+
 void RiscV::extractSppSpie() {
+
     __asm__ volatile ("csrw sepc, ra");
+    __asm__ volatile("csrc sstatus, %0" : : "r"(SSTATUS_SPP));  // SPP = 0  -> posle sret-a smo u KORISNICKOM rezimu
+    __asm__ volatile("csrs sstatus, %0" : : "r"(SSTATUS_SPIE)); // SPIE = 1 -> posle sret-a su prekidi ukljuceni (SIE <- SPIE)
     __asm__ volatile ("sret");
 }
 

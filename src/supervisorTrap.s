@@ -35,6 +35,7 @@ supervisorTrap:
     li t1, 0x8000000000000009
     beq t0, t1, handleConsoleInterrupt__LABEL
 
+    j panic__LABEL
 
     handleSynchronousSysCalls__LABEL:
     call handleSynchronousSysCalls
@@ -57,3 +58,8 @@ supervisorTrap:
     addi sp, sp, 256
 
     sret
+
+    panic__LABEL:
+    call handleUnknownTrap # registri su vec sacuvani na vrhu rutine; ova funkcija ne vraca kontrolu
+    repeat:
+    j repeat # za svaki slucaj zavrti u mestu

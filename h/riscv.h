@@ -2,7 +2,6 @@
 #define riscv
 
 #include "../lib/hw.h"
-#include "../lib/console.h"
 #include "../h/TCB.h"
 #include "../h/syscall_c.h"
 
@@ -16,6 +15,7 @@ private:
     static void handleSynchronousSysCalls()     __asm__ ("handleSynchronousSysCalls");
     static void handleTimerInterrupt()          __asm__ ("handleTimerInterrupt");
     static void handleConsoleInterrupt()        __asm__ ("handleConsoleInterrupt");
+    static void handleUnknownTrap()             __asm__ ("handleUnknownTrap");
 
 public:
     static void pushRegisters();    //push x3..x31 na stek
@@ -63,6 +63,7 @@ public:
         SSTATUS_SIE = (1 << 1),
         SSTATUS_SPIE = (1 << 5),
         SSTATUS_SPP = (1 << 8),
+        SSTATUS_SUM  = (1 << 18),   // S-rezim sme da pristupa korisnickim (U=1) stranicama
     };
 
     static void     ms_sstatus(uint64 mask);

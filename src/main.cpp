@@ -32,8 +32,8 @@ int main() {
     thread_t t1;
     thread_create(&t1,&userMain, nullptr);
 
+    //RiscV::ms_sstatus(RiscV::SSTATUS_SUM);   // jezgro sme da dira korisnicki stek i handle-ove
     // ukljuci prekide
-    //__asm__ volatile ("csrs sstatus, 0x02");
     RiscV::ms_sstatus(RiscV::SSTATUS_SIE);
 
 
@@ -41,6 +41,9 @@ int main() {
     {
         thread_dispatch();
     }
+
+    //halt
+    *((volatile uint32*)0x100000) = 0x5555;
 
     return 0;
 };

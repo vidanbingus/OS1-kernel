@@ -68,17 +68,35 @@ private:
     char ch;
     int  count;
 };
+class TimeShareWorker2 : public Thread {
+public:
+    TimeShareWorker2(char c, int n) : Thread(), ch(c), count(n) {}
+protected:
+    void run() override {
+        for (int i = 0; i < count; i++) {
+            Console::putc(ch);
+            busyWait(30000000);               // dovoljno dugo da tajmer preotme
+            if (i == 7) {
+                __asm__("csrw sscratch, 0x5");
+            }
+        }
+        gDone->signal();
+    }
+private:
+    char ch;
+    int  count;
+};
 
 static void test_timeSharing() {
+
     banner("TEST 1: deljenje vremena (asinhrona promena konteksta)");
     line("Ocekivano: isprepletani znakovi 'a' i 'b' (ne svi 'a' pa svi 'b').");
 
     TimeShareWorker w1('a', 12);
-    TimeShareWorker w2('b', 12);
+    TimeShareWorker2 w2('b', 12);
     w1.start();
     w2.start();
 
-    gDone->wait();
     gDone->wait();
     print_string("\n[TEST 1 OK]\n");
     Thread::sleep(10);                        // settle: pusti niti da dosegnu thread_exit
@@ -152,6 +170,7 @@ static void consumerBody(void* arg) {
 }
 
 static void test_producerConsumer() {
+
     banner("TEST 3: proizvodjac/potrosac (Buffer, kapacitet 4)");
     line("Ocekivano: ispisuje se A..J (potrosnja prati proizvodnju).");
 
@@ -301,6 +320,7 @@ void userMain(void* /*arg*/) {
     // --- sinhronizacioni objekti ---
     gDone  = new Semaphore(0);
     gMutex = new Semaphore(1);
+
 
     test_timeSharing();
     test_mutex();

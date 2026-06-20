@@ -4,17 +4,16 @@
 #include "../h/syscall_c.h"
 
 int print_char(char ch) {
+
     putc(ch);
     return 0;
 }
 
 int print_string(const char* str) {
-    uint64 sstatus = RiscV::r_sstatus();
-    RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
+
     while (*str != '\0') {
         putc(*(str++));
     }
-    RiscV::ms_sstatus(sstatus & RiscV::SSTATUS_SIE ? RiscV::SSTATUS_SIE : 0);
     return 0;
 }
 
@@ -49,15 +48,12 @@ int print_size(size_t val, uint8 base) {
 
 int print_int(int val, uint8 base)
 {
-    uint64 sstatus = RiscV::r_sstatus();
-    RiscV::mc_sstatus(RiscV::SSTATUS_SIE);
     if (val < 0) {
         putc('-');
         val = -val;
     }
 
     int ret = print_size((size_t)val, base);
-    RiscV::ms_sstatus(sstatus & RiscV::SSTATUS_SIE ? RiscV::SSTATUS_SIE : 0);
     return ret;
 
 }

@@ -32,6 +32,7 @@ void TCB::dispatch() {
 void TCB::threadWrapper() {
     if (!running->isKernelThread)
         RiscV::extractSppSpie();
+
     running->body(running->arg);
     thread_exit();
 }

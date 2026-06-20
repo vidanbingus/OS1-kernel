@@ -44,7 +44,7 @@ int mem_free(void* ptr) {
 
 int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
 
-    void* sp = MemoryAllocator::mem_alloc(DEFAULT_STACK_SIZE);
+    void* sp = mem_alloc(DEFAULT_STACK_SIZE);
 
     //void* sp = MemoryAllocator::mem_alloc(DEFAULT_STACK_SIZE / MEM_BLOCK_SIZE); ako je u blokovima
 
