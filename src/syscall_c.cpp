@@ -58,7 +58,7 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
     register uint64 arg1 __asm__("a1") = (uint64)handle;        // Prvi argument funkcije
     register uint64 arg2 __asm__("a2") = (uint64)start_routine; // Pokazivač na funkciju npr. u a2
     register uint64 arg3 __asm__("a3") = (uint64)arg;           // Argument za tu funkciju npr. u a3
-    register uint64 arg4 __asm__("a6") = stack_top;               // Vrh alociranog steka šaljemo kernelu u a4
+    register uint64 arg4 __asm__("a4") = stack_top;               // Vrh alociranog steka šaljemo kernelu u a4
 
     //OVO RESENJE ZAVISI OD KOMPAJLERA!!!!!!!!!!1
 

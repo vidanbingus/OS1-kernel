@@ -12,7 +12,8 @@ public:
 
 private:
 
-    static void handleSynchronousSysCalls()     __asm__ ("handleSynchronousSysCalls");
+    static uint64 handleSynchronousSysCalls(uint64, uint64, uint64, uint64,
+                                        uint64, uint64, uint64, uint64)     __asm__ ("handleSynchronousSysCalls");
     static void handleTimerInterrupt()          __asm__ ("handleTimerInterrupt");
     static void handleConsoleInterrupt()        __asm__ ("handleConsoleInterrupt");
     static void handleUnknownTrap()             __asm__ ("handleUnknownTrap");
