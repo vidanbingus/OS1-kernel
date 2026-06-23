@@ -1,7 +1,7 @@
-#include "../h/riscv.h"
-#include "../h/opCodes.h"
-#include "../h/MemoryAllocator.h"
-#include "../h/KConsole.h"
+#include "../h/riscv.hpp"
+#include "../h/opCodes.hpp"
+#include "../h/MemoryAllocator.hpp"
+#include "../h/KConsole.hpp"
 
 // --- panic ispis: direktno na konzolni kontroler, bez sistemskih poziva/semafora ---
 static void panicPutc(char c) {

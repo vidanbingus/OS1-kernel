@@ -1,8 +1,8 @@
 #ifndef PROJECT_BASE__SEM_H
 #define PROJECT_BASE__SEM_H
-#include "KernelObject.h"
-#include "list.h"
-#include "TCB.h"
+#include "KernelObject.hpp"
+#include "list.hpp"
+#include "TCB.hpp"
 
 
 class _sem : public KernelObject {
@@ -14,6 +14,10 @@ public:
     int wait();
     int signal();
     int close();
+
+    int wait_n(unsigned n);
+    int signal_n(unsigned n);
+
 
 private:
     int val;

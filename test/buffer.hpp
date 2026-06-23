@@ -1,11 +1,12 @@
 //
-// Created by os on 6/18/26.
+// Created by zika on 2/26/22.
 //
 
-#ifndef PROJECT_BASE_BUFFER_H
-#define PROJECT_BASE_BUFFER_H
-#include "../h/syscall_c.h"
-#include "../h/print.h"
+#ifndef OS1_BUFFER_CPP_H
+#define OS1_BUFFER_CPP_H
+
+#include "../h/syscall_c.hpp"
+#include "printing.hpp"
 
 class Buffer {
 private:
@@ -29,4 +30,6 @@ public:
 
 };
 
-#endif //PROJECT_BASE_BUFFER_H
+
+#endif //OS1_BUFFER_CPP_H
+

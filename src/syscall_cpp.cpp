@@ -1,4 +1,4 @@
-#include "../h/syscall_cpp.h"
+#include "../h/syscall_cpp.hpp"
 
 Thread::Thread(void (*body)(void*), void* arg)
         : myHandle(nullptr), body(body), arg(arg) {}

@@ -1,4 +1,4 @@
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 
 MemoryAllocator::BlockHeader* MemoryAllocator::freeMemHead = nullptr;
 

@@ -1,8 +1,8 @@
 #ifndef PROJECT_BASE_KCONSOLE_H
 #define PROJECT_BASE_KCONSOLE_H
 #include "../lib/hw.h"
-#include "../h/_sem.h"
-#include "../h/TCB.h"
+#include "../h/_sem.hpp"
+#include "../h/TCB.hpp"
 
 class KConsole {
 public:

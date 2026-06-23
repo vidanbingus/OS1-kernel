@@ -1,7 +1,7 @@
 #ifndef PROJECT_BASE_KERNELOBJECT_H
 #define PROJECT_BASE_KERNELOBJECT_H
 
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 
 class KernelObject {
 public:

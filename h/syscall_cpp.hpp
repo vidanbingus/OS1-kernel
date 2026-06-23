@@ -2,7 +2,7 @@
 #define PROJECT_BASE_SYSCALL_CPP_H
 
 
-#include "../h/syscall_c.h"
+#include "../h/syscall_c.hpp"
 #include "../lib/hw.h"
 
 class Thread {

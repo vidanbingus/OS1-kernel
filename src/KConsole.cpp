@@ -1,4 +1,4 @@
-#include "../h/KConsole.h"
+#include "../h/KConsole.hpp"
 
 char KConsole::inBuf[CAP];
 char KConsole::outBuf[CAP];

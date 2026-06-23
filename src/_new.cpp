@@ -1,5 +1,5 @@
 #include "../lib/hw.h"
-#include "../h/syscall_c.h"
+#include "../h/syscall_c.hpp"
 
 void *operator new(size_t n)              { return mem_alloc(n); }
 void *operator new[](size_t n)            { return mem_alloc(n); }

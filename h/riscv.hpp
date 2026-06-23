@@ -2,8 +2,8 @@
 #define riscv
 
 #include "../lib/hw.h"
-#include "../h/TCB.h"
-#include "../h/syscall_c.h"
+#include "../h/TCB.hpp"
+#include "../h/syscall_c.hpp"
 
 class RiscV {
 public:

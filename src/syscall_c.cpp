@@ -1,4 +1,4 @@
-#include "../h/syscall_c.h"
+#include "../h/syscall_c.hpp"
 
 //umesto da svaki put pripremas syscall pojedinacnim instrikcijama koje loaduju u a0,a1..
 //napravi funkciju koja to radi
@@ -53,14 +53,12 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
     // Računamo vrh steka (stack pointer raste nadole, pa mu dodajemo veličinu)
    uint64 stack_top = (uint64)sp + DEFAULT_STACK_SIZE;
 
-    // 2. Vezujemo argumente direktno za željene registre po tvom šablonu
+
     register uint64 arg0 __asm__("a0") = 0x11;                    // opCode za THREAD_CREATE je 0x11
     register uint64 arg1 __asm__("a1") = (uint64)handle;        // Prvi argument funkcije
     register uint64 arg2 __asm__("a2") = (uint64)start_routine; // Pokazivač na funkciju npr. u a2
     register uint64 arg3 __asm__("a3") = (uint64)arg;           // Argument za tu funkciju npr. u a3
     register uint64 arg4 __asm__("a4") = stack_top;               // Vrh alociranog steka šaljemo kernelu u a4
-
-    //OVO RESENJE ZAVISI OD KOMPAJLERA!!!!!!!!!!1
 
 
     // 3. Ispaljujemo ecall u jednom jedinom bloku

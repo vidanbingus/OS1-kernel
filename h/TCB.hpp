@@ -2,10 +2,10 @@
 #define PROJECT_BASE_TCB_H
 
 #include "../lib/hw.h"
-#include "../h/Scheduler.h"
-#include "../h/MemoryAllocator.h"
-#include "../h/print.h"
-#include "../h/KernelObject.h"
+#include "../h/Scheduler.hpp"
+#include "../h/MemoryAllocator.hpp"
+#include "../h/print.hpp"
+#include "../h/KernelObject.hpp"
 
 class TCB : public KernelObject {
 public:

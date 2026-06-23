@@ -1,8 +1,8 @@
-#include "../h/workers.h"
+#include "../h/workers.hpp"
 #include "../lib/hw.h"
-#include "../h/TCB.h"
-#include "../h/print.h"
-#include "../h/syscall_c.h"
+#include "../h/TCB.hpp"
+#include "../h/print.hpp"
+#include "../h/syscall_c.hpp"
 
 void workerBodyA(void* arg)
 {

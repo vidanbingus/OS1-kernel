@@ -1,10 +1,10 @@
 #ifndef syscall_c
 #define syscall_c
 
-#include "_sem.h"
-#include "../h/TCB.h"
+#include "_sem.hpp"
+#include "../h/TCB.hpp"
 #include "../lib/hw.h"
-#include "../h/MemoryAllocator.h"
+#include "../h/MemoryAllocator.hpp"
 
 typedef TCB* thread_t;
 typedef _sem* sem_t;

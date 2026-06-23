@@ -1,5 +1,5 @@
-#include "../h/Scheduler.h"
-#include "../h/print.h"
+#include "../h/Scheduler.hpp"
+#include "../h/print.hpp"
 
 List<TCB> Scheduler::readyQueue;
 

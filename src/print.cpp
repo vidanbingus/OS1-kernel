@@ -1,7 +1,7 @@
-#include "../h/print.h"
+#include "../h/print.hpp"
 
-#include "../h/riscv.h"
-#include "../h/syscall_c.h"
+#include "../h/riscv.hpp"
+#include "../h/syscall_c.hpp"
 
 int print_char(char ch) {
 

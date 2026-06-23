@@ -1,6 +1,6 @@
-#include "../h/_sem.h"
+#include "../h/_sem.hpp"
 
-#include "../h/syscall_c.h"
+#include "../h/syscall_c.hpp"
 
 _sem::_sem(unsigned initVal) : val(initVal), isOpen(true) {}
 
