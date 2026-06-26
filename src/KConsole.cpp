@@ -24,7 +24,7 @@ void KConsole::putc(char c) {
     outSpace->wait();                  // blokira ako je izlazni bafer pun
     outBuf[outTail] = c;
     outTail = (outTail + 1) % CAP;
-    outItem->signal();                 // budi internu nit za slanje
+    outItem->signal();                 //budi onu kernelsku nit za slanje
 }
 
 char KConsole::getc() {
@@ -46,7 +46,7 @@ void KConsole::handleInterrupt() {
                 inTail = next;
                 inItem->signal();
             }
-            // ako je bafer pun -> znak se odbacuje
+            // ako je bafer pun onda se znak odbacuje
         }
     }
     plic_complete(irq);
@@ -54,11 +54,11 @@ void KConsole::handleInterrupt() {
 
 void KConsole::outputBody(void*) {
     while (true) {
-        outItem->wait();                // cekaj znak (kooperativno se odrice procesora)
+        outItem->wait();                // cekaj znak, odrice se procesore
         char c = outBuf[outHead];
         outHead = (outHead + 1) % CAP;
         outSpace->signal();
-        // prozivanje: cekaj da kontroler bude spreman za slanje
+        // ispitivanje ready bita kontrolera periferije (kao AR)
         while (!(*(volatile uint8*)CONSOLE_STATUS & CONSOLE_TX_STATUS_BIT)) { }
         *(volatile char*)CONSOLE_TX_DATA = c;
     }

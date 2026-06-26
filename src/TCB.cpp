@@ -31,7 +31,7 @@ void TCB::dispatch() {
 
 void TCB::threadWrapper() {
     if (!running->isKernelThread)
-        RiscV::extractSppSpie();
+        RiscV::popSppSpie();
 
     running->body(running->arg);
     thread_exit();
@@ -44,7 +44,7 @@ TCB* TCB::createKernelThread(Body body, void* arg) {
 }
 
 void TCB::sleep(time_t ticks) {
-    if (ticks == 0) return;                  // ne uspavljuj na 0 perioda
+    if (ticks == 0) return;
 
     running->wakeTime = systemTime + ticks;
     running->setBlocked(true);
@@ -61,7 +61,7 @@ void TCB::sleep(time_t ticks) {
     else
         sleepHead = running;
 
-    dispatch();                              // SIE je vec 0 (pozvano iz obrade ecall-a)
+    dispatch();
 }
 
 void TCB::tick() {

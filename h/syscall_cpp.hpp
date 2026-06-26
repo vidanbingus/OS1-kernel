@@ -28,6 +28,9 @@ public:
     virtual ~Semaphore();
     int wait();
     int signal();
+    int wait(unsigned n);
+    int signal(unsigned n);
+
 private:
     sem_t myHandle;
 };
@@ -38,7 +41,7 @@ public:
 protected:
     PeriodicThread(time_t period);
     virtual void periodicActivation() {}
-    void run() override;                 // override Thread::run (ne menja set virtuala)
+    void run() override;
 private:
     time_t period;
 };

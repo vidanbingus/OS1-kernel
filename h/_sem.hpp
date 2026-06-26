@@ -20,6 +20,8 @@ public:
 
 
 private:
+    void wakeReady();
+
     int val;
     bool isOpen;
 

@@ -7,12 +7,11 @@
 class KConsole {
 public:
     static void init();
-    static void putc(char c);          // iz obrade sistemskog poziva PUTC
-    static char getc();                // iz obrade sistemskog poziva GETC
-    static void handleInterrupt();     // iz prekidne rutine za konzolu
-
+    static void putc(char c);
+    static char getc();
+    static void handleInterrupt();
 private:
-    static void outputBody(void*);     // telo interne (sistemske) niti za slanje
+    static void outputBody(void*);     // telo ove kernelske niti za slanje
     enum { CAP = 256 };
     static char inBuf[CAP];
     static char outBuf[CAP];

@@ -25,10 +25,16 @@ Semaphore::Semaphore(unsigned init) : myHandle(nullptr) {
     sem_open(&myHandle, init);
 }
 Semaphore::~Semaphore()  { sem_close(myHandle); }
+
 int Semaphore::wait() {
     return sem_wait(myHandle);
 }
 int Semaphore::signal()  { return sem_signal(myHandle); }
+
+int Semaphore::wait(unsigned n)   { return sem_wait_n(myHandle, n); }
+
+int Semaphore::signal(unsigned n) { return sem_signal_n(myHandle, n); }
+
 
 PeriodicThread::PeriodicThread(time_t period)
         : Thread(), period(period) {}

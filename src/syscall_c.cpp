@@ -1,26 +1,19 @@
 #include "../h/syscall_c.hpp"
 
-//umesto da svaki put pripremas syscall pojedinacnim instrikcijama koje loaduju u a0,a1..
-//napravi funkciju koja to radi
-//takodje, za povratnu vrednost napravi funkciju koja to radi
 
 void* mem_alloc(size_t size) {
 
     size_t newSize = ((size + MEM_BLOCK_SIZE - 1) / MEM_BLOCK_SIZE) * MEM_BLOCK_SIZE;
 
-    //priprema argumenata za sistemski poziv
 
-    register uint64 arg0 __asm__("a0") = 0x01;    // opCode za mem_alloc ide u a0
-    register uint64 arg1 __asm__("a1") = newSize; // Velicina ide u a1
+    register uint64 arg0 __asm__("a0") = 0x01;
+    register uint64 arg1 __asm__("a1") = newSize;
 
-    // Izvršavamo ecall.
-    // ":: "r"(arg0), "r"(arg1)" govori kompajleru da su ovi registri INPUTI.
-    // "=r"(arg0) govori da će ecall vratiti rezultat nazad u a0 (OUTPUT).
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                 // Output (a0)
-        : "r" (arg0), "r" (arg1)      // Inputi (a0 i a1)
-        : "memory"                    // Govori kompajleru da ecall može menjati RAM
+        : "=r" (arg0)                 // output (a0)
+        : "r" (arg0), "r" (arg1)      // inputi (a0 i a1)
+        : "memory"                    // govori kompajleru da ecall moze da menja ram
     );
 
     return (void*)arg0;
@@ -28,15 +21,15 @@ void* mem_alloc(size_t size) {
 }
 
 int mem_free(void* ptr) {
-    // Vezujemo C promenljive direktno za registre a0 i a1
-    register uint64 arg0 __asm__("a0") = 0x02;           // Op-kod za mem_free ide u a0
-    register uint64 arg1 __asm__("a1") = (uint64)ptr;  // Kastujemo pokazivač i stavljamo u a1
+
+    register uint64 arg0 __asm__("a0") = 0x02;
+    register uint64 arg1 __asm__("a1") = (uint64)ptr;
 
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)             // Output: rezultat sistemskog poziva se vraća u a0
-        : "r" (arg0), "r" (arg1)  // Inputi: kompajler garantuje da su a0 i a1 spremni pre ecall-a
-        : "memory"                // Clobber: oslobađanje memorije menja stanje RAM-a
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1)
+        : "memory"
     );
 
     return (int)arg0;
@@ -50,23 +43,21 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
 
     if (!sp) return -1; 
 
-    // Računamo vrh steka (stack pointer raste nadole, pa mu dodajemo veličinu)
+    // racunamo vrh steka
    uint64 stack_top = (uint64)sp + DEFAULT_STACK_SIZE;
 
 
-    register uint64 arg0 __asm__("a0") = 0x11;                    // opCode za THREAD_CREATE je 0x11
-    register uint64 arg1 __asm__("a1") = (uint64)handle;        // Prvi argument funkcije
-    register uint64 arg2 __asm__("a2") = (uint64)start_routine; // Pokazivač na funkciju npr. u a2
-    register uint64 arg3 __asm__("a3") = (uint64)arg;           // Argument za tu funkciju npr. u a3
-    register uint64 arg4 __asm__("a4") = stack_top;               // Vrh alociranog steka šaljemo kernelu u a4
+    register uint64 arg0 __asm__("a0") = 0x11;
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    register uint64 arg2 __asm__("a2") = (uint64)start_routine;
+    register uint64 arg3 __asm__("a3") = (uint64)arg;
+    register uint64 arg4 __asm__("a4") = stack_top;
 
-
-    // 3. Ispaljujemo ecall u jednom jedinom bloku
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
-        : "r" (arg0), "r" (arg1), "r" (arg2), "r" (arg3), "r" (arg4) // Ulazi: svi ovi registri moraju biti napunjeni
-        : "memory"                                        // Clobber: menjamo memoriju
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1), "r" (arg2), "r" (arg3), "r" (arg4)
+        : "memory"
     );
 
     return (int)arg0;
@@ -100,9 +91,9 @@ int sem_open(sem_t *handle, unsigned init) {
 
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
-        : "r" (arg0), "r" (arg1), "r" (arg2)                // Ulazi: svi ovi registri moraju biti napunjeni
-        : "memory"                                        // Clobber: menjamo memoriju
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1), "r" (arg2)
+        : "memory"
     );
 
     return (int)arg0;
@@ -114,9 +105,9 @@ int sem_close(sem_t handle) {
 
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
-        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
-        : "memory"                                        // Clobber: menjamo memoriju
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1)
+        : "memory"
     );
 
     return (int)arg0;
@@ -127,9 +118,9 @@ int sem_wait(sem_t handle) {
     register uint64 arg1 __asm__("a1") = (uint64)handle;
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
-        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
-        : "memory"                                        // Clobber: menjamo memoriju
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1)
+        : "memory"
     );
 
     return (int)arg0;
@@ -140,13 +131,42 @@ int sem_signal(sem_t handle) {
     register uint64 arg1 __asm__("a1") = (uint64)handle;
     __asm__ volatile (
         "ecall"
-        : "=r" (arg0)                                     // Izlaz: rezultat se vraca u a0
-        : "r" (arg0), "r" (arg1)                            // Ulazi: svi ovi registri moraju biti napunjeni
-        : "memory"                                        // Clobber: menjamo memoriju
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1)
+        : "memory"
     );
 
     return (int)arg0;
 }
+
+int sem_wait_n(sem_t handle, unsigned n) {
+    register uint64 arg0 __asm__("a0") = 0x25;              //opCode za SEM_WAIT_N je 0x25
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    register uint64 arg2 __asm__("a2") = (uint64)n;
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1), "r" (arg2)
+        : "memory"
+    );
+
+    return (int)arg0;
+}
+
+int sem_signal_n(sem_t handle, unsigned n) {
+    register uint64 arg0 __asm__("a0") = 0x26;              //opCode za SEM_SIGNAL_N je 0x26
+    register uint64 arg1 __asm__("a1") = (uint64)handle;
+    register uint64 arg2 __asm__("a2") = (uint64)n;
+    __asm__ volatile (
+        "ecall"
+        : "=r" (arg0)
+        : "r" (arg0), "r" (arg1), "r" (arg2)
+        : "memory"
+    );
+
+    return (int)arg0;
+}
+
 
 int time_sleep(time_t t) {
     register uint64 arg0 __asm__("a0") = 0x31;

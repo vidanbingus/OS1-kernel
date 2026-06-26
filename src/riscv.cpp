@@ -3,7 +3,7 @@
 #include "../h/MemoryAllocator.hpp"
 #include "../h/KConsole.hpp"
 
-// --- panic ispis: direktno na konzolni kontroler, bez sistemskih poziva/semafora ---
+//poziv direktno na konzolni kontroler (naravno ne sme sistemski poziv ako je nesto puklo)
 static void panicPutc(char c) {
     while (!(*(volatile uint8*)CONSOLE_STATUS & CONSOLE_TX_STATUS_BIT)) { }
     *(volatile char*)CONSOLE_TX_DATA = c;
@@ -30,32 +30,30 @@ void RiscV::handleUnknownTrap() {
     uint64 stval   = r_stval();
     uint64 sstatus = r_sstatus();
 
-    bool fromUser = (sstatus & SSTATUS_SPP) == 0;   // SPP=0 -> trap je dosao iz korisnickog rezima
+    bool fromUser = (sstatus & SSTATUS_SPP) == 0;
 
-    panicPrint("\n*** TRAP: neocekivan uzrok ***\n");
+    panicPrint("\nTRAP, neocekivan uzrok!!\n");
     panicPrint("  scause = "); panicPrintHex(scause); panicPrint("\n");
     panicPrint("  sepc   = "); panicPrintHex(sepc);   panicPrint("\n");
     panicPrint("  stval  = "); panicPrintHex(stval);  panicPrint("\n");
 
     if (!fromUser) {
-        // Greska u sistemskom rezimu (jezgro, idle/main, konzolna nit) -> nema oporavka.
-        panicPrint("  -> greska u jezgru, zaustavljam sistem\n");
+        panicPrint("  GRESKA U KERNELU, halt\n");
         *((volatile uint32*)0x100000) = 0x5555;
         while (true) { }
     }
 
-    // SOFT: pukla je korisnicka nit -> ugasi samo nju i nastavi (isto kao thread_exit).
-    panicPrint("  -> gasim nit koja je pukla i nastavljam\n");
+    panicPrint("  gasim nit koja je pukla i nastavljam\n");
     TCB::running->setFinished(true);
     TCB::toDelete = TCB::running;
     TCB::dispatch();
 }
 
-void RiscV::extractSppSpie() {
+void RiscV::popSppSpie() {
 
     __asm__ volatile ("csrw sepc, ra");
-    __asm__ volatile("csrc sstatus, %0" : : "r"(SSTATUS_SPP));  // SPP = 0  -> posle sret-a smo u KORISNICKOM rezimu
-    __asm__ volatile("csrs sstatus, %0" : : "r"(SSTATUS_SPIE)); // SPIE = 1 -> posle sret-a su prekidi ukljuceni (SIE <- SPIE)
+    __asm__ volatile("csrc sstatus, %0" : : "r"(SSTATUS_SPP));
+    __asm__ volatile("csrs sstatus, %0" : : "r"(SSTATUS_SPIE));
     __asm__ volatile ("sret");
 }
 
@@ -86,7 +84,7 @@ uint64 RiscV::handleSynchronousSysCalls(uint64 a0, uint64 a1, uint64 a2, uint64 
             thread_t** handle = (thread_t**)a1;
             TCB::Body body = (TCB::Body)a2;
             void* arg = (void*)a3;
-            uint64* stack_top = (uint64*)a4; // pazi: iz thread_create smo poslali VRH steka (stack_top)
+            uint64* stack_top = (uint64*)a4; //vrh steka
 
 
             uint64* stack_start = (uint64*)((uint64)stack_top - DEFAULT_STACK_SIZE);
@@ -143,6 +141,19 @@ uint64 RiscV::handleSynchronousSysCalls(uint64 a0, uint64 a1, uint64 a2, uint64 
             retValue = handle->signal();
             break;
         }
+        case SEM_WAIT_N: {
+            sem_t handle = (sem_t)a1;
+            unsigned n = (unsigned)a2;
+            retValue = handle->wait_n(n);
+            break;
+        }
+        case SEM_SIGNAL_N: {
+            sem_t handle = (sem_t)a1;
+            unsigned n = (unsigned)a2;
+            retValue = handle->signal_n(n);
+            break;
+        }
+
         case TIME_SLEEP: {
             uint64 t = (uint64)a1;
             TCB::sleep(t);

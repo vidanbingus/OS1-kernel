@@ -15,7 +15,7 @@ void MemoryAllocator::init() {
 void* MemoryAllocator::mem_alloc(size_t size) {
     if (!size) return nullptr;
 
-    size_t blocksNeeded = (size + MEM_BLOCK_SIZE -1) / MEM_BLOCK_SIZE + 1; // jedan dodatan block potreban za BlockHeader
+    size_t blocksNeeded = (size + MEM_BLOCK_SIZE -1) / MEM_BLOCK_SIZE + 1; // jedan dodatan block treba za BlockHeader
     BlockHeader* prev = nullptr;
     BlockHeader* curr = freeMemHead;
 

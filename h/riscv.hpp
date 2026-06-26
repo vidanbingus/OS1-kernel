@@ -22,7 +22,7 @@ public:
     static void pushRegisters();    //push x3..x31 na stek
     static void popRegisters();     //pop  x3..x31 na stek
 
-    static void extractSppSpie();   //ne sme da bude inline nikako
+    static void popSppSpie();   //ne sme da bude inline nikako
 
     // funkcije koje su navedene ispod su u formatu r_sreg ili w_sreg sto oznacava citanje ili upis,
     // a sreg je sistemski registar na koji se to r ili w odnosi:

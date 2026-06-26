@@ -47,7 +47,7 @@ public:
             Thread::sleep((i + td->id) % 5);
         }
 
-        td->sem->signal();
+        td->sem->signal(1);
     }
 };
 
@@ -74,7 +74,7 @@ public:
             Console::putc(key);
         }
 
-        td->sem->signal();
+        td->sem->signal(1);
     }
 };
 
@@ -135,7 +135,7 @@ void testConsumerProducer() {
     Thread::dispatch();
 
     for (int i = 0; i <= threadNum; i++) {
-        waitForAll->wait();
+        waitForAll->wait(1);
     }
 
     delete waitForAll;

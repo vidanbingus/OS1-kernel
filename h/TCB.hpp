@@ -91,6 +91,7 @@ private:
     bool isKernelThread;     // za konzolu
     uint64 wakeTime;         // tik na koji nit treba probuditi
     TCB* nextSleeper;        // ulancavanje u listi uspavanih
+    unsigned semNeed;        // koliko jedinica nit ceka u sem_wait_n
 
     static uint64 timeSliceCounter;
     static TCB* sleepHead;
